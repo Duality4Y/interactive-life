@@ -18,7 +18,7 @@ static_lib_dir = 'lib/'
 lib_dir = 'libraries/'
 
 # system installed libs that are needed.
-system_libs = []
+system_libs = ['SDL2']
 
 # local libs are libraries inside of the project libraries folder.
 # asuming the library folder has the same name as the library folderl (lib+foldername).
