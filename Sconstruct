@@ -24,7 +24,7 @@ system_libs = ['SDL2']
 # asuming the library folder has the same name as the library folderl (lib+foldername).
 local_libs = []
 
-ccflags = ['-Werror']
+ccflags = []
 # for debugging symbols.
 ccflags.append('-ggdb3')
 ccflags.append('-O0')
