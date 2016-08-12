@@ -1,34 +1,45 @@
 #ifndef __LIFE_H__
 #define __LIFE_H__
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
+#include <vector>
+
+using std::vector;
+
+// this is for action you may want to take uppon cell positions.
+// gets passed grid position and state of cell at position.
 
 class Life
 {
 public:
-    Life(size_t, size_t);
+    Life(int, int);
     ~Life();
     void progress();
     void swapBuffers();
 
     // function that check the state of cells around a cell.
-    size_t totalAround(size_t, size_t);
-    bool checkUpper(size_t, size_t);
-    bool checkLower(size_t, size_t);
-    bool checkLeft(size_t, size_t);
-    bool checkRight(size_t, size_t);
-    bool checkUpperLeft(size_t, size_t);
-    bool checkUpperRight(size_t, size_t);
-    bool checkLowerLeft(size_t, size_t);
-    bool checkLowerRight(size_t, size_t);
+    int totalAround(int, int);
 
-    size_t field_width, field_height;
+    void draw_glider(int, int);
+
+    int field_width, field_height;
     // field holds current state to be displayed.
-    bool **field;
+    // vector< vector<int>> field;
+    int **field;
     // buffer holds changes.
-    bool **buffer;
+    // vector< vector<int>> buffer;
+    int **buffer;
+
+    static const int surviveAbility = 2;
+    static const int reproductiveNumber = 3;
+
 };
 
 #endif
