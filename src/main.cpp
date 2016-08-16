@@ -22,13 +22,17 @@ public:
 
     Life *life;
     int life_window_width, life_window_height;
-    double life_window_xscale = 2;
-    double life_window_yscale = 2;
-    int cell_width;
-    int cell_height;
+    double life_window_xscale = (3.0 / 4.0);
+    double life_window_yscale = (3.0 / 4.0);
+    double cell_width;
+    double cell_height;
+    // is true if mouse on window pane.
+    // else false
+    int m_life_pane = false;
 
     SDL_Window *window;
     SDL_Renderer *renderer;
+    int mx, my;
     int framerate = 20;
 };
 
@@ -49,13 +53,15 @@ Game::Game(int width, int height)
 
     // hard code cell size of 5 can be adjusted
     // this->cell_width = this->cell_height = 5;
-    this->cell_width = (current.w / this->life_window_xscale) / width;
-    this->cell_height = (current.h / this->life_window_yscale) / height;
+    current.w = 800;
+    current.h = 600;
+    this->cell_width = (current.w * this->life_window_xscale) / width;
+    this->cell_height = (current.h * this->life_window_yscale) / height;
     this->life_window_width = width * this->cell_width;
     this->life_window_height = height * this->cell_height;
-    printf("%d, %d\n", this->cell_width, this->cell_height);
+    printf("%d, %d\n", (int)this->cell_width, (int)this->cell_height);
 
-    uint32_t flags = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP;
+    uint32_t flags = SDL_WINDOW_SHOWN ;//| SDL_WINDOW_FULLSCREEN_DESKTOP;
     this->window = SDL_CreateWindow("Interactive Life Simulation.",
                                     SDL_WINDOWPOS_UNDEFINED,
                                     SDL_WINDOWPOS_UNDEFINED,
@@ -97,10 +103,33 @@ void Game::handle_input()
         {
             exit(0);
         }
-        if(e.type == SDL_KEYDOWN)
+        if(e.type == SDL_KEYUP)
         {
-            exit(0);
+            switch(e.key.keysym.sym)
+            {
+                case SDLK_SPACE:
+                    this->life->paused = !this->life->paused;
+                    break;
+                case SDLK_q:
+                    exit(0);
+                    break;
+            }
         }
+    }
+    SDL_GetMouseState(&(this->mx), &(this->my));
+    // dectect if mouse in life field.
+    if((this->mx < (this->life->field_width * this->cell_width)) &&
+       (this->my < (this->life->field_height * this->cell_height)))
+    {
+        this->m_life_pane = true;
+    }
+    else
+    {
+        this->m_life_pane = false;
+    }
+    if(this->m_life_pane)
+    {
+        printf("mouse in life pane: %d, %d         \r", this->mx, this->my);
     }
 }
 

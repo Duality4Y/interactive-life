@@ -8,8 +8,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
-
 #include <vector>
+
+#include <lifepatterns.h>
+
+typedef int** field_t;
+typedef int cell_t;
 
 using std::vector;
 
@@ -19,23 +23,25 @@ using std::vector;
 class Life
 {
 public:
-    Life(int, int);
+    Life(cell_t, cell_t);
     ~Life();
     void progress();
     void swapBuffers();
 
     // function that check the state of cells around a cell.
-    int totalAround(int, int);
+    cell_t totalAround(cell_t, cell_t);
 
-    void draw_glider(int, int);
+    void draw_cell(cell_t, cell_t, cell_t);
+    void draw_replicator(cell_t, cell_t);
+    void draw_glider(cell_t, cell_t);
 
-    int field_width, field_height;
+    cell_t field_width, field_height;
     // field holds current state to be displayed.
-    // vector< vector<int>> field;
-    int **field;
+    field_t field;
     // buffer holds changes.
-    // vector< vector<int>> buffer;
-    int **buffer;
+    field_t buffer;
+
+    int paused = false;
 
     static const int surviveAbility = 2;
     static const int reproductiveNumber = 3;
