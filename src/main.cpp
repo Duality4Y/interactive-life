@@ -11,33 +11,32 @@ extern "C"
 class Game
 {
 public:
-    Game(int, int);
+    Game(int, int, int, int);
     ~Game();
 
     void draw_point(int, int, int, int);
     void draw_line(int, int, int, int);
+    void draw_grid();
     void draw_field_border(int, int, int, int);
     void handle_input();
     void process();
     void run();
 
-    Life *life;
-    int life_window_width, life_window_height;
-    double life_window_xscale = (3.0 / 4.0);
-    double life_window_yscale = (3.0 / 4.0);
-    double cell_width;
-    double cell_height;
-    // is true if mouse on window pane.
-    // else false
-    int m_life_pane = false;
-
     SDL_Window *window;
     SDL_Renderer *renderer;
+
+    Life *life;
+    int life_window_width, life_window_height;
+    int cell_width;
+    int cell_height;
+
     int mx, my;
+    int m_life_pane = false;
+    int lmclick = false;
     int framerate = 20;
 };
 
-Game::Game(int width, int height)
+Game::Game(int width, int height, int cell_width, int cell_height)
 {
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -54,22 +53,24 @@ Game::Game(int width, int height)
 
     // hard code cell size of 5 can be adjusted
     // this->cell_width = this->cell_height = 5;
-    current.w = 800;
-    current.h = 600;
-    this->cell_width = (current.w * this->life_window_xscale) / width;
-    this->cell_height = (current.h * this->life_window_yscale) / height;
+    // current.w = 800;
+    // current.h = 600;
+    // this->cell_width = (current.w * this->life_window_xscale) / width;
+    // this->cell_height = (current.h * this->life_window_yscale) / height;
+    this->cell_width = cell_width;
+    this->cell_height = cell_height;
     this->life_window_width = width * this->cell_width;
     this->life_window_height = height * this->cell_height;
-    printf("%d, %d\n", (int)this->cell_width, (int)this->cell_height);
+    printf("%d, %d\n", this->cell_width, this->cell_height);
 
-    uint32_t flags = SDL_WINDOW_SHOWN ;//| SDL_WINDOW_FULLSCREEN_DESKTOP;
+    uint32_t flags = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP;
     this->window = SDL_CreateWindow("Interactive Life Simulation.",
                                     SDL_WINDOWPOS_UNDEFINED,
                                     SDL_WINDOWPOS_UNDEFINED,
                                     current.w, current.h,
                                     flags);
 
-    this->renderer = SDL_CreateRenderer(this->window, 1, 0);
+    this->renderer = SDL_CreateRenderer(this->window, -1, 0);
     if(this->renderer == NULL)
     {
         fprintf(stderr, "Renderer could not be created! SDL Error: %s\n", SDL_GetError());
@@ -116,6 +117,14 @@ void Game::handle_input()
                     break;
             }
         }
+        if(e.type == SDL_MOUSEBUTTONDOWN)
+        {
+            this->lmclick = true;
+        }
+        if(e.type == SDL_MOUSEBUTTONUP)
+        {
+            this->lmclick = false;
+        }
     }
     SDL_GetMouseState(&(this->mx), &(this->my));
     // dectect if mouse in life field.
@@ -128,10 +137,6 @@ void Game::handle_input()
     {
         this->m_life_pane = false;
     }
-    if(this->m_life_pane)
-    {
-        printf("mouse in life pane: %d, %d         \r", this->mx, this->my);
-    }
 }
 
 void Game::draw_point(int x, int y, int width, int height)
@@ -141,14 +146,20 @@ void Game::draw_point(int x, int y, int width, int height)
     r.y = y;
     r.w = width;
     r.h = height;
-    SDL_SetRenderDrawColor(this->renderer, 0xFF, 0xFF, 0xFF, 0x00);
+    SDL_SetRenderDrawColor(this->renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderFillRect(this->renderer, &r);
     // draw border if cells biger then 2x2
     if(width > 2 && height > 2)
     {
-        SDL_SetRenderDrawColor(this->renderer, 0x00,0x00, 0x00, 0x00);
+        SDL_SetRenderDrawColor(this->renderer, 0x00,0x00, 0x00, 0xFF);
         SDL_RenderDrawRect(this->renderer, &r);
     }
+}
+
+void Game::draw_line(int x, int y, int x1, int y1)
+{
+    SDL_SetRenderDrawColor(this->renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderDrawLine(this->renderer, x, y, x1, y1);
 }
 
 void Game::draw_field_border(int x, int y, int width, int height)
@@ -158,14 +169,21 @@ void Game::draw_field_border(int x, int y, int width, int height)
     r.y = y;
     r.w = width;
     r.h = height;
-    SDL_SetRenderDrawColor(this->renderer, 0xFF, 0xFF, 0xFF, 0x00);
+    SDL_SetRenderDrawColor(this->renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderDrawRect(this->renderer, &r);
 }
 
-void Game::draw_line(int x, int y, int x1, int y1)
+void Game::draw_grid()
 {
-    SDL_SetRenderDrawColor(this->renderer, 0xFF, 0xFF, 0xFF, 0x00);
-    SDL_RenderDrawLine(this->renderer, x, y, x1, y1);
+    // draws lines to form grid
+    for(int x = 0; x < this->life_window_width; x+=this->cell_width)
+    {
+        this->draw_line(x, 0, x, this->life_window_height);
+    }
+    for(int y = 0; y < this->life_window_height; y += this->cell_height)
+    {
+        this->draw_line(0, y, this->life_window_width, y);
+    }
 }
 
 void Game::process()
@@ -173,7 +191,7 @@ void Game::process()
     this->life->progress();
 
     // clear background
-    SDL_SetRenderDrawColor(this->renderer, 0x00, 0x00, 0x00, 0x00);
+    SDL_SetRenderDrawColor(this->renderer, 0x00, 0x00, 0x00, 0xFF);
     SDL_RenderClear(this->renderer);
 
     // draw cells for life.
@@ -182,7 +200,10 @@ void Game::process()
         for(int y = 0; y < this->life->field_height; y++)
         {
             if(this->life->field[x][y])
-                this->draw_point(x * this->cell_width, y * this->cell_height, this->cell_width, this->cell_height);
+                this->draw_point(x * this->cell_width,
+                                 y * this->cell_height,
+                                 this->cell_width,
+                                 this->cell_height);
         }
     }
 
@@ -191,13 +212,31 @@ void Game::process()
     this->draw_field_border(0, 0, this->life_window_width, this->life_window_height);
 
     // draw grid
-    this->draw_line(0, 0, this->life_window_width, this->life_window_height);
-    for(int x = 0; x < this->life_window_width; x+=this->cell_width)
+    // this->draw_grid();
+
+    // draw square for cell where mouse is over that cell
+    if(this->m_life_pane)
     {
-        //this->draw_line(0, 0, this->life_window_width, this->life_window_height);
+        SDL_ShowCursor(SDL_DISABLE);
+        int px = this->mx - (this->mx % this->cell_width);
+        int py = this->my - (this->my % this->cell_height);
+        this->draw_point(px, py, this->cell_width, this->cell_height);
+        if(this->lmclick)
+        {
+            // printf("mclick: %d, %d\n", this->mx / this->cell_width,
+            //                            this->my / this->cell_height);
+            int lx = this->mx / this->cell_width;
+            int ly = this->my / this->cell_height;
+            if((lx > 0 && lx < this->life->field_width) &&
+               (ly > 0 && ly < this->life->field_height))
+            {
+                this->life->field[lx][ly] = 1;
+            }
+        }
     }
-    for(int y = 0; y < this->life->field_height; y++)
+    else
     {
+        SDL_ShowCursor(SDL_ENABLE);
     }
     
     // draw to window.
@@ -217,7 +256,7 @@ void Game::run()
 
 int main(void)
 {
-    Game game = Game(128, 64);
+    Game game = Game(128, 64, 8, 8);
     game.run();
 
     return 0;

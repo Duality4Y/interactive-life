@@ -9,23 +9,39 @@ Life::Life(cell_t width, cell_t height)
     for(cell_t x = 0; x < this->field_width; x++)
     {
         this->field[x] = new cell_t[this->field_height];
-        memset(this->field[x], '\0', this->field_height);
     }
     
     this->buffer = new cell_t *[this->field_width];
     for(cell_t x = 0; x < this->field_width; x++)
     {
         this->buffer[x] = new cell_t[this->field_height];
-        memset(this->buffer[x], '\0', this->field_height);
     }
 
-    // this->draw_glider(0, 0);
+    this->clear();
+
+    this->draw_glider(0, 0);
     this->draw_glider(width / 2 + 20, 0);
     this->draw_replicator(20, 20);
-    this->field[this->field_width - 1][this->field_height - 1] = true;
+    // this->field[this->field_width - 1][this->field_height - 1] = true;
 }
 
 Life::~Life(){}
+
+void Life::clear()
+{
+    for(cell_t x = 0; x < this->field_width; x++)
+    {
+        this->field[x] = new cell_t[this->field_height];
+        memset(this->field[x], '\0', this->field_height);
+    }
+
+    for(cell_t x = 0; x < this->field_width; x++)
+    {
+        this->buffer[x] = new cell_t[this->field_height];
+        memset(this->buffer[x], '\0', this->field_height);
+    }
+
+}
 
 void Life::draw_glider(cell_t px, cell_t py)
 {

@@ -26,6 +26,7 @@ public:
     Life(cell_t, cell_t);
     ~Life();
     void progress();
+    void clear();
     void swapBuffers();
 
     // function that check the state of cells around a cell.
