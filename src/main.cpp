@@ -15,6 +15,7 @@ public:
     ~Game();
 
     void draw_point(int, int, int, int);
+    void draw_line(int, int, int, int);
     void draw_field_border(int, int, int, int);
     void handle_input();
     void process();
@@ -161,6 +162,12 @@ void Game::draw_field_border(int x, int y, int width, int height)
     SDL_RenderDrawRect(this->renderer, &r);
 }
 
+void Game::draw_line(int x, int y, int x1, int y1)
+{
+    SDL_SetRenderDrawColor(this->renderer, 0xFF, 0xFF, 0xFF, 0x00);
+    SDL_RenderDrawLine(this->renderer, x, y, x1, y1);
+}
+
 void Game::process()
 {
     this->life->progress();
@@ -182,6 +189,16 @@ void Game::process()
 
     // draw life field border.
     this->draw_field_border(0, 0, this->life_window_width, this->life_window_height);
+
+    // draw grid
+    this->draw_line(0, 0, this->life_window_width, this->life_window_height);
+    for(int x = 0; x < this->life_window_width; x+=this->cell_width)
+    {
+        //this->draw_line(0, 0, this->life_window_width, this->life_window_height);
+    }
+    for(int y = 0; y < this->life->field_height; y++)
+    {
+    }
     
     // draw to window.
     SDL_RenderPresent(this->renderer);
