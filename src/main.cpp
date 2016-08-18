@@ -44,7 +44,8 @@ Game::Game(int width, int height, int cell_width, int cell_height)
         exit(-1);
     }
 
-    static SDL_DisplayMode current;
+    SDL_DisplayMode current;
+    printf("possible configurations: %d\n", SDL_GetNumVideoDisplays());
     if(SDL_GetDisplayMode(0, 0, &current) != 0)
     {
         fprintf(stderr, "couldn't get display mode\n");
