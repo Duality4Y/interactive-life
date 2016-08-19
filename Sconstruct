@@ -26,13 +26,14 @@ local_libs = []
 
 ccflags = []
 # for debugging symbols.
-ccflags.append('-O3')
-# ccflags.append('-ggdb3')
-# ccflags.append('-O0')
+# ccflags.append('-O3')
+ccflags.append('-ggdb3')
+ccflags.append('-O0')
 ccflags.append('-ansi')
 ccflags.append('-pedantic-errors')
 ccflags.append('-Wextra')
 ccflags.append('-Wall')
+ccflags.append('-fdiagnostics-color=always')
 ccflags.append('--std=c++11')
 
 

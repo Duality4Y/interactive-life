@@ -1,6 +1,16 @@
 #include "life.h"
 
+Life::Life()
+{
+    this->init(1, 1);
+}
+
 Life::Life(cell_t width, cell_t height)
+{
+    this->init(width, height);
+}
+
+void Life::init(cell_t width, cell_t height)
 {
     this->field_width = width;
     this->field_height = height;
@@ -19,10 +29,9 @@ Life::Life(cell_t width, cell_t height)
 
     this->clear();
 
-    this->draw_glider(0, 0);
-    this->draw_glider(width / 2 + 20, 0);
-    this->draw_replicator(20, 20);
-    // this->field[this->field_width - 1][this->field_height - 1] = true;
+    // this->draw_glider(0, 0);
+    // this->draw_glider(width / 2 + 20, 0);
+    // this->draw_replicator(20, 20);
 }
 
 Life::~Life(){}
@@ -94,6 +103,11 @@ void Life::draw_replicator(cell_t px, cell_t py)
 
 void Life::draw_cell(cell_t x, cell_t y, cell_t state)
 {
+    if(x < 0 || x >= this->field_width)
+        return;
+    if(y < 0 || y >= this->field_height)
+        return;
+
     this->field[x][y] = state;
 }
 

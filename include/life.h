@@ -23,8 +23,11 @@ using std::vector;
 class Life
 {
 public:
+    Life();
     Life(cell_t, cell_t);
     ~Life();
+
+    void init(cell_t, cell_t);
     void progress();
     void clear();
     void swapBuffers();
