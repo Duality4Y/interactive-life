@@ -31,16 +31,12 @@ void Life::clear()
 {
     for(cell_t x = 0; x < this->field_width; x++)
     {
-        this->field[x] = new cell_t[this->field_height];
-        memset(this->field[x], '\0', this->field_height);
+        for(cell_t y = 0; y < this->field_height; y++)
+        {
+            this->field[x][y] = false;
+            this->buffer[x][y] = false;
+        }
     }
-
-    for(cell_t x = 0; x < this->field_width; x++)
-    {
-        this->buffer[x] = new cell_t[this->field_height];
-        memset(this->buffer[x], '\0', this->field_height);
-    }
-
 }
 
 void Life::draw_glider(cell_t px, cell_t py)

@@ -116,6 +116,9 @@ void Game::handle_input()
                 case SDLK_q:
                     exit(0);
                     break;
+                case SDLK_c:
+                    this->life->clear();
+                    break;
             }
         }
         if(e.type == SDL_MOUSEBUTTONDOWN)
