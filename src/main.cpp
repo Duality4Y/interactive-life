@@ -18,6 +18,7 @@ public:
     void draw_line(int, int, int, int);
     void draw_grid();
     void draw_field_border(int, int, int, int);
+    void draw_cell_line(int, int, int, int);
     void handle_input();
     void process();
     void run();
@@ -30,7 +31,7 @@ public:
     int cell_width;
     int cell_height;
 
-    int mx, my;
+    int mx = 0, my = 0, pmx = 0, pmy = 0;
     int m_life_pane = false;
     int lmclick = false;
     int framerate = 20;
@@ -54,8 +55,8 @@ Game::Game(int width, int height, int cell_width, int cell_height)
 
     // hard code cell size of 5 can be adjusted
     // this->cell_width = this->cell_height = 5;
-    // current.w = 800;
-    // current.h = 600;
+    current.w = 800;
+    current.h = 600;
     // this->cell_width = (current.w * this->life_window_xscale) / width;
     // this->cell_height = (current.h * this->life_window_yscale) / height;
     this->cell_width = cell_width;
@@ -64,7 +65,7 @@ Game::Game(int width, int height, int cell_width, int cell_height)
     this->life_window_height = height * this->cell_height;
     printf("%d, %d\n", this->cell_width, this->cell_height);
 
-    uint32_t flags = SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP;
+    uint32_t flags = SDL_WINDOW_SHOWN; //| SDL_WINDOW_FULLSCREEN_DESKTOP;
     this->window = SDL_CreateWindow("Interactive Life Simulation.",
                                     SDL_WINDOWPOS_UNDEFINED,
                                     SDL_WINDOWPOS_UNDEFINED,
@@ -166,6 +167,34 @@ void Game::draw_line(int x, int y, int x1, int y1)
     SDL_RenderDrawLine(this->renderer, x, y, x1, y1);
 }
 
+void Game::draw_cell_line(int x0, int y0, int x1, int y1)
+{
+    int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+    int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+    int err = (dx>dy ? dx : -dy)/2, e2;
+
+    for(;;)
+    {
+        // setPixel(x0,y0);
+        this->life->field[x0][y0] = true;
+        if (x0==x1 && y0==y1)
+        {
+            break;
+        }
+        e2 = err;
+        if (e2 >-dx)
+        {
+            err -= dy;
+            x0 += sx;
+        }
+        if (e2 < dy)
+        {
+            err += dx;
+            y0 += sy;
+        }
+    }
+}
+
 void Game::draw_field_border(int x, int y, int width, int height)
 {
     static SDL_Rect r;
@@ -235,8 +264,16 @@ void Game::process()
                (ly > 0 && ly < this->life->field_height))
             {
                 this->life->field[lx][ly] = 1;
+                if(this->mx != this->pmx || this->my != this->pmy)
+                {
+                    int lpx = this->pmx / this->cell_width;
+                    int lpy = this->pmy / this->cell_height;
+                    this->draw_cell_line(lx, ly, lpx, lpy);
+                }
             }
         }
+        this->pmx = this->mx;
+        this->pmy = this->my;
     }
     else
     {
@@ -260,7 +297,7 @@ void Game::run()
 
 int main(void)
 {
-    Game game = Game(128, 64, 8, 8);
+    Game game = Game(128/2, 64, 8, 8);
     game.run();
 
     return 0;
