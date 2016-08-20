@@ -1,43 +1,5 @@
 #include "game.h"
 
-LifePane::LifePane()
-{
-    rect_t cell_dims = {0, 0, 1, 1};
-    rect_t field_dims = {1, 1, 1, 1};
-    this->init(field_dims, cell_dims);
-}
-
-LifePane::LifePane(rect_t field_dims, rect_t cell_dims)
-{
-    this->init(field_dims, cell_dims);
-}
-
-void LifePane::init(rect_t field_dims, rect_t cell_dims)
-{
-    this->field_dims = field_dims;
-    this->cell_dims = cell_dims;
-    this->life = Life(this->field_dims.w, this->field_dims.h);
-}
-
-void LifePane::handle_input(SDL_Event event)
-{
-}
-
-void LifePane::process()
-{}
-
-void LifePane::draw_cell(int x, int y, int state)
-{
-    static int rx, ry;
-    rx = x / this->cell_dims.w;
-    ry = y / this->cell_dims.h;
-
-    this->life.draw_cell(rx, ry, state);
-}
-
-void LifePane::draw(SDL_Renderer *renderer)
-{}
-
 Game::Game(int width, int height, int cell_width, int cell_height)
 {
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -83,7 +45,7 @@ Game::Game(int width, int height, int cell_width, int cell_height)
     this->life = Life(width, height);
 
     rect_t cell_dims = {0, 0, cell_width, cell_height};
-    rect_t field_dims = {32, 32, width, height};
+    rect_t field_dims = {cell_width * width, 0, width, height};
     this->lpane = LifePane(field_dims, cell_dims);
 }
 
@@ -117,7 +79,7 @@ void Game::handle_input()
             switch(e.key.keysym.sym)
             {
                 case SDLK_SPACE:
-                    this->life.paused = !this->life.paused;
+                    this->pause = !this->pause;
                     break;
                 case SDLK_q:
                     exit(0);
@@ -213,13 +175,18 @@ void Game::draw_field_border(int x, int y, int width, int height)
 
 void Game::process()
 {
-    this->life.progress();
-    this->lpane.process();
-    this->lpane.draw(this->renderer);
-
+    if(!this->pause)
+    {
+        this->life.progress();
+        this->lpane.process();
+    }
+    
     // clear background
     SDL_SetRenderDrawColor(this->renderer, 0x00, 0x00, 0x00, 0xFF);
     SDL_RenderClear(this->renderer);
+
+    // draw everything
+    this->lpane.draw(this->renderer);
 
     // draw cells for life.
     for(int x = 0; x < this->life.field_width; x++)

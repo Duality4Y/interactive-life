@@ -2,18 +2,17 @@ from glob import glob
 import os
 import fnmatch
 
+project_name = 'alife'
+
 prefix = ''
 cc = prefix + 'gcc'
 cxx = prefix + 'g++'
 ar = prefix + 'ar'
 ranlib = prefix + 'ranlib'
 
-project_name = 'alife'
 build_dir = 'build/'
-
 src_dir = 'src/'
 include_dir = 'include/'
-
 static_lib_dir = 'lib/'
 lib_dir = 'libraries/'
 

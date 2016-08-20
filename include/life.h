@@ -1,25 +1,14 @@
 #ifndef __LIFE_H__
 #define __LIFE_H__
 
-#include <stdio.h>
 #include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <vector>
 
-#include <lifepatterns.h>
+// used type for field en indexes.
+typedef int32_t** field_t;
+typedef int32_t cell_t;
 
-typedef int** field_t;
-typedef int cell_t;
-
-using std::vector;
-
-// this is for action you may want to take uppon cell positions.
-// gets passed grid position and state of cell at position.
-
+// a 2D field of points
+// with a check functions for the game of life.
 class Life
 {
 public:
@@ -35,7 +24,8 @@ public:
     // function that check the state of cells around a cell.
     cell_t totalAround(cell_t, cell_t);
 
-    void draw_cell(cell_t, cell_t, cell_t);
+    void set_cell(cell_t, cell_t, cell_t);
+    cell_t get_cell(cell_t, cell_t);
     void draw_replicator(cell_t, cell_t);
     void draw_glider(cell_t, cell_t);
 
@@ -44,8 +34,6 @@ public:
     field_t field;
     // buffer holds changes.
     field_t buffer;
-
-    int paused = false;
 
     static const int surviveAbility = 2;
     static const int reproductiveNumber = 3;
