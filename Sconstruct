@@ -24,15 +24,34 @@ system_libs = ['SDL2']
 # asuming the library folder has the same name as the library folderl (lib+foldername).
 local_libs = []
 
+
+# compiler flags for when doing development.
+cc_dev_flags = []
+cc_dev_flags.append('-ggdb3')
+cc_dev_flags.append('-O0')
+cc_dev_flags.append('-fdiagnostics-color=always')
+
+# compiler flags for when building a library.
+cc_lib_flags = []
+cc_lib_flags.append('-fPIC')
+
+
+# default compiler flags. always included.
 ccflags = []
-# for debugging symbols.
-ccflags.append('-ggdb3')
-ccflags.append('-O0')
+ccflags.append('-O2')
 ccflags.append('-ansi')
 ccflags.append('-pedantic-errors')
 ccflags.append('-Wextra')
 ccflags.append('-Wall')
 ccflags.append('--std=c++11')
+
+# in a release build no flags are added.
+if 'libbuild' in COMMAND_LINE_TARGETS:
+    ccflags += cc_lib_flags
+elif 'devbuild' in COMMAND_LINE_TARGETS:
+    # remove optimization from default flags.
+    ccflags.remove('-O2')
+    ccflags += cc_dev_flags
 
 
 # setup build environment
@@ -86,15 +105,23 @@ objects = []
 for (obj_target, src_file) in zip(obj_targets, src_files):
     objects.append(env.Object(target=obj_target, source=src_file))
 
-if 'libbuild' in COMMAND_LINE_TARGETS:
-    env.StaticLibrary(target=static_lib_dir + project_name, source=objects)
-else:
-    env.Program(target=build_dir + project_name, source=objects)
+program = env.Program(target=build_dir + project_name, source=objects)
+static = env.StaticLibrary(target=static_lib_dir + project_name, source=objects)
 
-Clean('.', build_dir)
-Clean('.', static_lib_dir)
+
+env.Alias('libbuild', static)
+env.Alias('devbuild', program)
+env.Default(program)
+
+# this removes both build dir and static dir
+# if they exist.
+env.Clean(program, build_dir)
+env.Clean(program, static_lib_dir)
+env.Clean(static, static_lib_dir)
 
 if 'CPPPATH' in env:
     print("cpppath: %s" % env['CPPPATH'])
 if 'LIBPATH' in env:
     print("libpath: %s" % env['LIBPATH'])
+
+print("DEF_TARG:%s" % (map(str, DEFAULT_TARGETS)))
