@@ -119,9 +119,6 @@ env.Clean(program, build_dir)
 env.Clean(program, static_lib_dir)
 env.Clean(static, static_lib_dir)
 
-# env.Clean('.', build_dir)
-# env.Clean('.', static_lib_dir)
-
 if 'CPPPATH' in env:
     print("cpppath: %s" % env['CPPPATH'])
 if 'LIBPATH' in env:
