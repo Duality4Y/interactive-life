@@ -30,6 +30,9 @@ void LifePanel::handle_input(SDL_Event event)
             case SDLK_c:
                 this->life.clear();
                 break;
+            case SDLK_SPACE:
+                this->paused = !this->paused;
+                break;
             default:
                 break;
         }
@@ -133,7 +136,8 @@ void LifePanel::draw_field_border(SDL_Renderer *renderer, rect_t rect)
 
 void LifePanel::process()
 {
-    this->life.progress();
+    if(!this->paused)
+        this->life.progress();
 
     if(this->m_life_panel)
     {

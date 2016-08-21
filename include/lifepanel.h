@@ -32,6 +32,7 @@ public:
     int mx = 0, my = 0, pmx = 0, pmy = 0;
     int m_life_panel = false;
     int lmclick = false;
+    int paused = false;
 
 };
 
