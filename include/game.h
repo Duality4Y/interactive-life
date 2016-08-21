@@ -15,14 +15,15 @@ public:
 
     void handle_input();
     void process();
+    void draw();
     void run();
 
     SDL_Window *window;
     SDL_Renderer *renderer;
 
     LifePanel lpane;
-    int pause = false;
     int fullscreen = true;
+    double framerate = 30;
 };
 
 #endif

@@ -47,7 +47,8 @@ Game::Game(int width, int height, int cell_width, int cell_height)
                                     flags);
 
     // create a sdl renderer to draw on.
-    this->renderer = SDL_CreateRenderer(this->window, -1, 0);
+    uint32_t rendererflags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE;
+    this->renderer = SDL_CreateRenderer(this->window, -1, rendererflags);
     if(this->renderer == NULL)
     {
         fprintf(stderr, "Renderer could not be created! SDL Error: %s\n", SDL_GetError());
@@ -88,9 +89,6 @@ void Game::handle_input()
         {
             switch(event.key.keysym.sym)
             {
-                case SDLK_SPACE:
-                    this->pause = !this->pause;
-                    break;
                 case SDLK_q:
                     exit(0);
                     break;
@@ -101,11 +99,11 @@ void Game::handle_input()
 
 void Game::process()
 {
-    if(!this->pause)
-    {
-        this->lpane.process();
-    }
-    
+    this->lpane.process();
+}
+
+void Game::draw()
+{
     // clear background
     SDL_SetRenderDrawColor(this->renderer, 0x00, 0x00, 0x00, 0xFF);
     SDL_RenderClear(this->renderer);
@@ -124,6 +122,7 @@ void Game::run()
     {
         this->handle_input();
         this->process();
-        // SDL_Delay(1000 / this->framerate);
+        this->draw();
+        SDL_Delay(1000 / this->framerate);
     }
 }
