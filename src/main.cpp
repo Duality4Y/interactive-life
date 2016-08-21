@@ -10,7 +10,7 @@ extern "C"
 
 int main(void)
 {
-    Game game = Game(128/4, 64/2, 8, 8);
+    Game game = Game(128, 64, 8, 8);
     game.run();
 
     return 0;

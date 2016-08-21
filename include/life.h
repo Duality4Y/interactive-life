@@ -24,7 +24,7 @@ public:
     // function that check the state of cells around a cell.
     cell_t totalAround(cell_t, cell_t);
 
-    void set_cell(cell_t, cell_t, cell_t);
+    int set_cell(cell_t, cell_t, cell_t);
     cell_t get_cell(cell_t, cell_t);
     void draw_replicator(cell_t, cell_t);
     void draw_glider(cell_t, cell_t);

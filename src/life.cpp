@@ -101,14 +101,15 @@ void Life::draw_replicator(cell_t px, cell_t py)
     }
 }
 
-void Life::set_cell(cell_t x, cell_t y, cell_t state)
+int Life::set_cell(cell_t x, cell_t y, cell_t state)
 {
     if(x < 0 || x >= this->field_width)
-        return;
+        return 0;
     if(y < 0 || y >= this->field_height)
-        return;
+        return 0;
 
     this->field[x][y] = state;
+    return 1;
 }
 
 cell_t Life::get_cell(cell_t x, cell_t y)

@@ -1,16 +1,16 @@
-#ifndef __LIFEPANE_H__
-#define __LIFEPANE_H__
+#ifndef __LIFEpanel_H__
+#define __LIFEpanel_H__
 
 #include <SDL2/SDL.h>
 
 #include <life.h>
 #include <rect.h>
 
-class LifePane
+class LifePanel
 {
 public:
-    LifePane();
-    LifePane(rect_t, rect_t);
+    LifePanel();
+    LifePanel(rect_t, rect_t);
     void init(rect_t, rect_t);
     void handle_input(SDL_Event);
     void process();
@@ -20,13 +20,19 @@ public:
     void draw_line(SDL_Renderer *, rect_t);
     void draw_field_border(SDL_Renderer *, rect_t);
     void draw_cell(int, int, int);
-    void draw_cell_line(SDL_Renderer *, rect_t);
+    void draw_cell_relative(int, int, int);
+    void draw_cell_line(int, int, int, int);
 
     int x, y, width, height;
     
     Life life;
     rect_t field_dims;
     rect_t cell_dims;
+
+    int mx = 0, my = 0, pmx = 0, pmy = 0;
+    int m_life_panel = false;
+    int lmclick = false;
+
 };
 
 #endif
