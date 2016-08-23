@@ -12,10 +12,10 @@ public:
     LifePanel();
     LifePanel(rect_t, rect_t);
     void init(rect_t, rect_t);
-    void handle_input(SDL_Event);
-    void process();
-
-    void draw(SDL_Renderer *);
+    virtual void handle_input(SDL_Event);
+    virtual void process();
+    virtual void draw(SDL_Renderer *);
+    
     void draw_point(SDL_Renderer *, rect_t);
     void draw_line(SDL_Renderer *, rect_t);
     void draw_field_border(SDL_Renderer *, rect_t);

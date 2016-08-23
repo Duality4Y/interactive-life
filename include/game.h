@@ -6,6 +6,7 @@
 #include <life.h>
 #include <rect.h>
 #include <lifepanel.h>
+#include <patternpanel.h>
 
 class Game
 {
@@ -21,7 +22,8 @@ public:
     SDL_Window *window;
     SDL_Renderer *renderer;
 
-    LifePanel lpane;
+    LifePanel lpanel;
+    PatternPanel glider_panel;
     int fullscreen = true;
     double framerate = 30;
 };

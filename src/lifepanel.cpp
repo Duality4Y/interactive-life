@@ -18,7 +18,6 @@ void LifePanel::init(rect_t field_dims, rect_t cell_dims)
     this->field_dims = field_dims;
     this->cell_dims = cell_dims;
     this->life = Life(this->field_dims.w, this->field_dims.h);
-    this->life.draw_glider(1, 1);
 }
 
 void LifePanel::handle_input(SDL_Event event)

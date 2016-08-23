@@ -57,7 +57,11 @@ Game::Game(int width, int height, int cell_width, int cell_height)
 
     rect_t cell_dims = {0, 0, cell_width, cell_height};
     rect_t field_dims = {0, 0, width, height};
-    this->lpane = LifePanel(field_dims, cell_dims);
+    this->lpanel = LifePanel(field_dims, cell_dims);
+
+    field_dims = {0, height * cell_dims.h, 3, 3};
+    this->glider_panel = PatternPanel(field_dims, cell_dims);
+    this->glider_panel.life.draw_glider(0, 0);
 }
 
 Game::~Game()
@@ -80,7 +84,8 @@ void Game::handle_input()
     static SDL_Event event;
     while(SDL_PollEvent(&event))
     {
-        this->lpane.handle_input(event);
+        this->lpanel.handle_input(event);
+        this->glider_panel.handle_input(event);
         if(event.type == SDL_QUIT)
         {
             exit(0);
@@ -99,7 +104,8 @@ void Game::handle_input()
 
 void Game::process()
 {
-    this->lpane.process();
+    this->lpanel.process();
+    this->glider_panel.process();
 }
 
 void Game::draw()
@@ -109,7 +115,8 @@ void Game::draw()
     SDL_RenderClear(this->renderer);
 
     // draw everything
-    this->lpane.draw(this->renderer);
+    this->lpanel.draw(this->renderer);
+    this->glider_panel.draw(this->renderer);
     
     // draw to window.
     SDL_RenderPresent(this->renderer);
@@ -123,6 +130,6 @@ void Game::run()
         this->handle_input();
         this->process();
         this->draw();
-        SDL_Delay(1000 / this->framerate);
+        // SDL_Delay(1000 / this->framerate);
     }
 }
