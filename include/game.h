@@ -10,7 +10,7 @@
 class Game
 {
 public:
-    Game(int, int, int, int);
+    Game(int, uint8_t);
     ~Game();
 
     void handle_input();
@@ -23,7 +23,8 @@ public:
 
     LifePanel lpane;
     int fullscreen = true;
-    double framerate = 30;
+    double framerate = 20;
+    uint8_t color_mode = 0;
 };
 
 #endif

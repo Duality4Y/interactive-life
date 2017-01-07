@@ -10,13 +10,13 @@ class LifePanel
 {
 public:
     LifePanel();
-    LifePanel(rect_t, rect_t);
-    void init(rect_t, rect_t);
+    LifePanel(rect_t, rect_t, uint8_t);
+    void init(rect_t, rect_t, uint8_t);
     void handle_input(SDL_Event);
     void process();
 
     void draw(SDL_Renderer *);
-    void draw_point(SDL_Renderer *, rect_t);
+    void draw_point(SDL_Renderer *, rect_t, uint8_t r, uint8_t g, uint8_t b);
     void draw_line(SDL_Renderer *, rect_t);
     void draw_field_border(SDL_Renderer *, rect_t);
     void draw_cell(int, int, int);
@@ -33,7 +33,8 @@ public:
     int m_life_panel = false;
     int lmclick = false;
     int paused = false;
-
+    uint8_t lmdelay = 0;
+    uint8_t color_mode = 0;
 };
 
 #endif

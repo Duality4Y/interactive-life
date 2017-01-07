@@ -5,16 +5,17 @@ LifePanel::LifePanel()
 {
     rect_t cell_dims = {0, 0, 1, 1};
     rect_t field_dims = {1, 1, 1, 1};
-    this->init(field_dims, cell_dims);
+    this->init(field_dims, cell_dims, 0);
 }
 
-LifePanel::LifePanel(rect_t field_dims, rect_t cell_dims)
+LifePanel::LifePanel(rect_t field_dims, rect_t cell_dims, uint8_t color_mode_param)
 {
-    this->init(field_dims, cell_dims);
+    this->init(field_dims, cell_dims, color_mode_param);
 }
 
-void LifePanel::init(rect_t field_dims, rect_t cell_dims)
+void LifePanel::init(rect_t field_dims, rect_t cell_dims, uint8_t color_mode_param)
 {
+    this->color_mode = color_mode_param;
     this->field_dims = field_dims;
     this->cell_dims = cell_dims;
     this->life = Life(this->field_dims.w, this->field_dims.h);
@@ -40,10 +41,12 @@ void LifePanel::handle_input(SDL_Event event)
     if(event.type == SDL_MOUSEBUTTONDOWN)
     {
         this->lmclick = true;
+        this->lmdelay = 1;
     }
     if(event.type == SDL_MOUSEBUTTONUP)
     {
         this->lmclick = false;
+        this->lmdelay = 0;
     }
 
     SDL_GetMouseState(&(this->mx), &(this->my));
@@ -104,14 +107,14 @@ void LifePanel::draw_cell_line(int x0, int y0, int x1, int y1)
     }
 }
 
-void LifePanel::draw_point(SDL_Renderer *renderer, rect_t rect)
+void LifePanel::draw_point(SDL_Renderer *renderer, rect_t rect, uint8_t cr = 0xFF, uint8_t cg = 0xFF, uint8_t cb = 0xFF)
 {
     static SDL_Rect r;
     r.x = rect.x;
     r.y = rect.y;
     r.w = rect.w;
     r.h = rect.h;
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_SetRenderDrawColor(renderer, cr, cg, cb, 0xFF);
     SDL_RenderFillRect(renderer, &r);
     // draw border if cells biger then 2x2
     if(rect.w > 2 && rect.h > 2)
@@ -162,21 +165,25 @@ void LifePanel::draw(SDL_Renderer *renderer)
         rect.y = py;
         rect.w = this->cell_dims.w;
         rect.h = this->cell_dims.h;
-        this->draw_point(renderer, rect);
+        if (this->lmclick) this->draw_point(renderer, rect);
 
         // on left click draw, draw lines if gaps between draws.
         if(this->lmclick)
         {
-            // draw point, and fill with line if delta movement big enough.
-            int lx = ((this->mx - this->field_dims.x) / this->cell_dims.w);
-            int ly = ((this->my - this->field_dims.y) / this->cell_dims.h);
-            this->draw_cell(lx, ly, 1);
-            if(this->mx != this->pmx || this->my != this->pmy)
-            {
-                int lpx = ((this->pmx - this->field_dims.x) / this->cell_dims.w);
-                int lpy = ((this->pmy - this->field_dims.y) / this->cell_dims.h);
-                this->draw_cell_line(lx, ly, lpx, lpy);
-            }
+            if (this->lmdelay>0) {
+              this->lmdelay--;
+            } else {
+              // draw point, and fill with line if delta movement big enough.
+              int lx = ((this->mx - this->field_dims.x) / this->cell_dims.w);
+              int ly = ((this->my - this->field_dims.y) / this->cell_dims.h);
+              this->draw_cell(lx, ly, 1);
+              if(this->mx != this->pmx || this->my != this->pmy)
+              {
+                  int lpx = ((this->pmx - this->field_dims.x) / this->cell_dims.w);
+                  int lpy = ((this->pmy - this->field_dims.y) / this->cell_dims.h);
+                  this->draw_cell_line(lx, ly, lpx, lpy);
+              }
+           }
         }
         this->pmx = this->mx;
         this->pmy = this->my;
@@ -187,7 +194,7 @@ void LifePanel::draw(SDL_Renderer *renderer)
     rect.w = this->field_dims.w * this->cell_dims.w;
     rect.h = this->field_dims.h * this->cell_dims.h;
 
-    this->draw_field_border(renderer, rect);
+    //if (this->lmdelay>0) this->draw_field_border(renderer, rect);
 
     for(int x = 0; x < this->life.field_width; x++)
     {
@@ -195,11 +202,39 @@ void LifePanel::draw(SDL_Renderer *renderer)
         {
             if(this->life.field[x][y])
             {
+		uint8_t cr = 255;
+		uint8_t cg = 255;
+		uint8_t cb = 255;
+
+		int ar = this->life.totalAround(x, y);
+
+		if (color_mode==1) {
+			cr = (uint8_t) ((uint16_t) (255*ar)/8); //<-- I like this one! -R
+			cg = 255-cr;
+			cb = 0;
+		} else if(color_mode==2) {
+                	int ar4 = ar; //For those who like bluestuffthingblearch
+                	if (ar4>4) {
+                	  ar4 = 4;
+                	}
+			cr = (uint8_t) ((uint16_t) (255*ar4)/4);
+                	cg = 255-cr;
+			if (ar>4) {
+        	          int arB = ar-4;
+        	          cb = (uint8_t) ((uint16_t) (255*arB)/4);
+        	          cr = 255-cb;
+        	        }
+		} else if(color_mode==3) {
+			cb = 255;
+			int nope = (uint8_t) ((uint16_t) (255*ar)/8);
+			cr = 255 - nope;
+			cg = 255 - nope;
+		}
                 rect.x = this->field_dims.x + (this->cell_dims.w * x);
                 rect.y = this->field_dims.y + (this->cell_dims.h * y);
                 rect.w = this->cell_dims.w;
                 rect.h = this->cell_dims.h;
-                this->draw_point(renderer, rect);
+                this->draw_point(renderer, rect, cr,cg,cb);
             }
         }
     }

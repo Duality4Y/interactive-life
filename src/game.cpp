@@ -1,7 +1,9 @@
 #include "game.h"
 
-Game::Game(int width, int height, int cell_width, int cell_height)
+Game::Game(int cell_height, uint8_t color_mode_param)
 {
+    int cell_width = cell_height;
+    this->color_mode = color_mode_param;
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         fprintf(stderr, "SDL could not initialize SDL_Error: %s\n", SDL_GetError());
@@ -27,7 +29,7 @@ Game::Game(int width, int height, int cell_width, int cell_height)
            current.refresh_rate
            );
 
-    uint32_t flags = SDL_WINDOW_SHOWN;
+    uint32_t flags = SDL_WINDOW_SHOWN | SDL_WINDOW_MAXIMIZED;
     if(this->fullscreen)
     {
         flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
@@ -39,6 +41,9 @@ Game::Game(int width, int height, int cell_width, int cell_height)
         current.w = 800;
         current.h = 600;
     }
+
+    int width = current.w/cell_width;
+    int height = current.h/cell_height;
 
     this->window = SDL_CreateWindow("Interactive Life Simulation.",
                                     SDL_WINDOWPOS_UNDEFINED,
@@ -57,7 +62,7 @@ Game::Game(int width, int height, int cell_width, int cell_height)
 
     rect_t cell_dims = {0, 0, cell_width, cell_height};
     rect_t field_dims = {0, 0, width, height};
-    this->lpane = LifePanel(field_dims, cell_dims);
+    this->lpane = LifePanel(field_dims, cell_dims, this->color_mode);
 }
 
 Game::~Game()
